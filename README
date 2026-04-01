@@ -1,0 +1,64 @@
+# ✈️ Flight Search System
+
+## 📌 Overview
+
+A simple flight search system built using the AirLabs API.
+It fetches flight routes between two airports, filters them by date, and returns structured flight data.
+
+---
+
+## ⚙️ Features
+
+* Fetches flight routes between airports
+* In-memory caching to reduce API calls
+* Filters flights based on selected date
+* Converts raw API data into a clean, consistent format
+
+---
+
+## 🧠 How It Works
+
+```text
+User Input (from, to, date)
+        ↓
+Fetch Routes (API / Cache)
+        ↓
+Filter by Day
+        ↓
+Normalize Data
+        ↓
+Return Flights
+```
+
+---
+
+## 📂 Main Functions
+
+* `fetchRoutes(from, to)` → gets route data from API
+* `getCache / setCache` → handles caching
+* `getDay(date)` → converts date to day
+* `normaliseFlight(raw, date)` → formats flight data
+* `searchFlights(from, to, date)` → main function
+
+---
+
+## 🛠️ Tech Stack
+
+* JavaScript (ES6)
+* Fetch API
+* AirLabs API
+
+---
+
+## ▶️ Example
+
+```js
+searchFlights("DEL", "BOM", "2026-03-30")
+  .then(console.log);
+```
+
+---
+
+## 🚀 Summary
+
+A clean implementation of a flight search pipeline with caching, filtering, and data transformation.
