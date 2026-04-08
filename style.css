@@ -1,0 +1,123 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input,
+button {
+  padding: 8px;
+  font-size: 14px;
+}
+
+button {
+  cursor: pointer;
+}
+
+#output {
+  margin-top: 10px;
+}
+
+.flight-card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: white;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.flight-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.flight-number {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.airport {
+  font-weight: bold;
+}
+
+.time {
+  color: #555;
+}
+
+.arrow {
+  margin: 0 6px;
+}
+
+.status {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status.scheduled {
+  color: green;
+}
+
+.status.delayed {
+  color: red;
+}
+
+.status.landed {
+  color: gray;
+}
+
+.delay {
+  color: red;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+
+  background: white;
+  border: 1px solid #ccc;
+
+  max-height: 150px;
+  overflow-y: auto;
+
+  z-index: 10;
+}
+
+.suggestions div {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.suggestions div:hover {
+  background: #eee;
+}
