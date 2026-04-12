@@ -1,4 +1,4 @@
-![SkyTrack Hero Banner](banner.png)
+![SkyTrack Hero Banner](assets/banner.png)
 
 # ✈️ SkyTrack | Premium Flight Explorer
 
@@ -29,9 +29,11 @@ The project is built using a "Lean-Core" philosophy—leveraging modern browser 
 
 ```text
 flight_tracker/
+├── assets/
+│   ├── banner.png   ← Hero banner image
+│   └── airports.js  ← Curated dataset of global airports
 ├── index.html      ← Main entry point & layout
 ├── style.css       ← Premium design system & theme variables
-├── airports.js     ← Curated dataset of global airports
 ├── api.js          ← API integration, caching, & normalization
 ├── app.js          ← Core UI logic & event orchestration
 └── README.md       ← Project documentation
