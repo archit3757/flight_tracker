@@ -231,3 +231,27 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.suggestions').forEach(b => b.innerHTML = "");
   }
 });
+
+// Theme Toggle
+const themeButton = document.getElementById('theme-toggle');
+
+themeButton.addEventListener('click', function() {
+  document.body.classList.toggle('dark-mode');
+  updateIcon();
+});
+
+function updateIcon() {
+  const isDark = document.body.classList.contains('dark-mode');
+  
+  if (isDark) {
+    themeButton.innerHTML = '<i data-lucide="sun"></i>';
+  } else {
+    themeButton.innerHTML = '<i data-lucide="moon"></i>';
+  }
+  
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateIcon);
