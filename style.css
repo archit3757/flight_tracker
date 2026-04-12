@@ -1,124 +1,377 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Light Theme Variables */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg: #fdfdfd;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --input-bg: #fff;
+  --shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  --radius: 14px;
+  
+  /* Status Colors */
+  --status-scheduled: #10b981;
+  --status-delayed: #ef4444;
+  --status-landed: #64748b;
+
+  /* Aviation Grid Color */
+  --grid-color: rgba(37, 99, 235, 0.03);
+}
+
+body.dark-mode {
+  /* Dark Theme Variables */
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --input-bg: #0f172a;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  --grid-color: rgba(255, 255, 255, 0.02);
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  /* Aviation Grid Pattern */
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 2rem 1rem;
 }
 
 .container {
-  max-width: 600px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-h2 {
+header {
+  margin-bottom: 2.5rem;
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.search-box {
+@media (min-width: 1024px) {
+  header {
+    text-align: left;
+    margin-bottom: 3rem;
+  }
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 2.5rem;
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+/* Horizontal Search Toolbar (Desktop) */
+.search-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 3rem;
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-input,
-button,
-select {
-  padding: 8px;
-  font-size: 14px;
+@media (min-width: 1024px) {
+  .search-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem 0.5rem 0.5rem 2rem;
+    border-radius: 999px;
+    gap: 0;
+  }
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  flex: 1;
+}
+
+@media (min-width: 1024px) {
+  .search-grid {
+    grid-template-columns: 1.2fr 1.2fr 1fr 1fr;
+    gap: 0;
+  }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .input-wrapper {
+    border-right: 1px solid var(--border);
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  .input-wrapper:first-child {
+    padding-left: 0;
+  }
+}
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.6rem 0;
+  font-size: 0.95rem;
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  outline: none;
+}
+
+/* On mobile, add back borders and padding for clarity */
+@media (max-width: 1023px) {
+  input, select {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    background: var(--input-bg);
+  }
+  .input-wrapper {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Search Actions */
+.search-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .search-actions {
+    margin-left: 1.5rem;
+    height: 100%;
+  }
 }
 
 button {
+  padding: 0.75rem 1.5rem;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 12px;
   cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
+#search-btn {
+  background: var(--primary);
+  color: white;
+  flex: 1;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  #search-btn {
+    border-radius: 999px;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+  }
+}
+
+#sort-btn {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+@media (min-width: 1024px) {
+  #sort-btn {
+    border: none;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Flight Results Grid */
 #output {
-  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  #output {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
 }
 
 .flight-card {
-  border: 1px solid #ddd;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  background: white;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .flight-card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
 }
 
-.flight-number {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 6px;
+.airport-code {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
-.route {
+.flight-time {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.delay-text {
+  color: var(--status-delayed);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.plane-icon {
+  color: var(--primary);
+  opacity: 0.6;
+}
+
+.flight-meta {
+  grid-column: 1 / -1;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
 }
 
-.airport {
-  font-weight: bold;
+.flight-number-badge {
+  background: var(--bg);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-muted);
 }
 
-.time {
-  color: #555;
+.flight-status {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
 }
 
-.arrow {
-  margin: 0 6px;
-}
+.flight-status.scheduled { background: rgba(16, 185, 129, 0.1); color: var(--status-scheduled); }
+.flight-status.landed { background: rgba(100, 116, 139, 0.1); color: var(--status-landed); }
+.flight-status.delayed { background: rgba(239, 68, 68, 0.1); color: var(--status-delayed); }
 
-.status {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.status.scheduled {
-  color: green;
-}
-
-.status.delayed {
-  color: red;
-}
-
-.status.landed {
-  color: gray;
-}
-
-.delay {
-  color: red;
-  font-size: 12px;
-  font-weight: bold;
-}
-
+/* Autocomplete Customization */
 .suggestions {
   position: absolute;
-  top: calc(100% + 4px);
+  top: 100%;
   left: 0;
-  right: 0;
-
-  background: white;
-  border: 1px solid #ccc;
-
-  max-height: 150px;
-  overflow-y: auto;
-
-  z-index: 10;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  box-shadow: var(--shadow);
+  z-index: 100;
 }
 
-.suggestions div {
-  padding: 6px;
+.suggestion-item {
+  padding: 0.8rem 1.2rem;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.suggestions div:hover {
-  background: #eee;
+.suggestion-item:hover {
+  background: var(--bg);
+}
+
+/* Theme Toggle Button */
+#theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+#theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 5rem 1rem;
+  color: var(--text-muted);
 }

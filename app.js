@@ -6,32 +6,47 @@ const sortBtn = document.getElementById('sort-btn');
 const timeFilter = document.getElementById('time-filter');
 const output = document.getElementById('output');
 
-let allFlights = [];      // unfiltered results from API
-let currentFlights = [];   // after time filter is applied
+let allFlights = [];      
+let currentFlights = [];   
 let currentSort = "time-asc";
+
+// Set default date to today
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.value = today;
+  lucide.createIcons();
+});
 
 setupAutocomplete(fromInput);
 setupAutocomplete(toInput);
 
-searchBtn.addEventListener('click', handleSearch);
+// Debounce the search to prevent accidental double-clicks
+searchBtn.addEventListener('click', debounce(handleSearch, 300));
 
 sortBtn.addEventListener('click', function () {
+  if (allFlights.length === 0) return;
+
   if (currentSort === "time-asc") {
     currentSort = "time-desc";
-    sortBtn.textContent = "Sort: Time ↓";
+    sortBtn.innerHTML = `<i data-lucide="arrow-down" size="18"></i> Sort: Latest`;
   } else {
     currentSort = "time-asc";
-    sortBtn.textContent = "Sort: Time ↑";
+    sortBtn.innerHTML = `<i data-lucide="arrow-up" size="18"></i> Sort: Earliest`;
   }
 
   applySort();
   renderFlights(currentFlights);
+  lucide.createIcons();
 });
 
 timeFilter.addEventListener('change', function () {
+  // Only apply filter if a search has already been performed
+  if (allFlights.length === 0) return;
+
   currentFlights = applyTimeFilter(allFlights);
   applySort();
   renderFlights(currentFlights);
+  lucide.createIcons();
 });
 
 async function handleSearch() {
@@ -40,12 +55,17 @@ async function handleSearch() {
   const date = dateInput.value;
 
   if (!from || !to || !date || from === to) {
-    output.textContent = "Invalid input";
+    showFeedback("Please provide a valid route and date.", "error");
     return;
   }
 
   searchBtn.disabled = true;
-  output.textContent = "Loading...";
+  output.innerHTML = `
+    <div class="empty-state">
+      <div class="loading-spinner"></div>
+      <p>Searching for the best routes...</p>
+    </div>
+  `;
 
   try {
     const flights = await searchFlights(from, to, date);
@@ -57,19 +77,27 @@ async function handleSearch() {
     renderFlights(currentFlights);
 
   } catch (err) {
-    output.textContent = "Something went wrong";
+    showFeedback("Unable to fetch flight data. Please try again later.", "error");
   } finally {
     searchBtn.disabled = false;
+    lucide.createIcons();
   }
 }
 
-// Returns a filtered copy of flights based on the selected time period
+function showFeedback(message, type) {
+  output.innerHTML = `
+    <div class="empty-state">
+      <i data-lucide="alert-circle" size="48" style="margin-bottom: 1rem; color: ${type === 'error' ? 'var(--status-delayed)' : 'var(--text-muted)'};"></i>
+      <p>${message}</p>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
 function applyTimeFilter(flights) {
   const period = timeFilter.value;
+  if (period === "all") return [...flights];
 
-  if (period === "all") return flights.slice();
-
-  // Define the hour ranges for each period
   const ranges = {
     morning: { start: 6, end: 12 },
     afternoon: { start: 12, end: 18 },
@@ -79,128 +107,127 @@ function applyTimeFilter(flights) {
 
   const range = ranges[period];
 
-  return flights.filter(function (f) {
+  return flights.filter(f => {
     const dep = f.departure.scheduled;
     if (!dep) return false;
-
-    // Extract the hour from the ISO-like datetime string (e.g. "2026-04-11T14:30:00")
     const hour = parseInt(dep.split('T')[1].split(':')[0], 10);
-
     return hour >= range.start && hour < range.end;
   });
 }
 
 function applySort() {
   if (currentSort === "time-asc") {
-    currentFlights.sort(function (a, b) {
-      return new Date(a.departure.scheduled) - new Date(b.departure.scheduled);
-    });
+    currentFlights.sort((a, b) => new Date(a.departure.scheduled) - new Date(b.departure.scheduled));
   } else {
-    currentFlights.sort(function (a, b) {
-      return new Date(b.departure.scheduled) - new Date(a.departure.scheduled);
-    });
+    currentFlights.sort((a, b) => new Date(b.departure.scheduled) - new Date(a.departure.scheduled));
   }
 }
 
 function formatTime(datetime) {
   if (!datetime) return "--:--";
-
-  const parts = datetime.split('T')[1].split(':');
-
-  const hours = parts[0];
-  const minutes = parts[1];
-
-  return hours + ":" + minutes;
+  const timeStr = datetime.split('T')[1];
+  return timeStr.substring(0, 5);
 }
 
 function renderFlights(flights) {
   output.innerHTML = "";
 
   if (!flights || flights.length === 0) {
-    output.textContent = "No flights found";
+    showFeedback("No flights found for this route and time.", "info");
     return;
   }
 
-  for (let i = 0; i < flights.length; i++) {
-    const f = flights[i];
-
-    const div = document.createElement("div");
-    div.className = "flight-card";
+  flights.forEach((f, index) => {
+    const card = document.createElement("div");
+    card.className = "flight-card";
+    card.style.animationDelay = `${index * 0.05}s`;
 
     const depTime = formatTime(f.departure.scheduled);
     const arrTime = formatTime(f.arrival.scheduled);
+    const depDelay = f.departure.delay ? `<span class="delay-text">+${f.departure.delay}m</span>` : "";
+    const arrDelay = f.arrival.delay ? `<span class="delay-text">+${f.arrival.delay}m</span>` : "";
+    
+    // Status Logic
+    let statusIcon = "calendar";
+    if (f.status === "landed") statusIcon = "check-circle";
+    if (f.departure.delay > 15) statusIcon = "clock";
 
-    const depDelay = f.departure.delay ? `<span class="delay">+${f.departure.delay}min</span>` : "";
-    const arrDelay = f.arrival.delay ? `<span class="delay">+${f.arrival.delay}min</span>` : "";
-
-    div.innerHTML = `
-      <div class="flight-number">${f.flight.iata}</div>
-
-      <div class="route">
-        <span class="airport">${f.departure.iata}</span>
-        <span class="time">${depTime}</span> ${depDelay}
-        <span class="arrow">→</span>
-        <span class="airport">${f.arrival.iata}</span>
-        <span class="time">${arrTime}</span> ${arrDelay}
+    card.innerHTML = `
+      <div class="flight-info departure">
+        <span class="airport-code">${f.departure.iata}</span>
+        <div class="flight-time">${depTime} ${depDelay}</div>
       </div>
 
-      <div class="status ${f.status}">
-        ${f.status.toUpperCase()}
+      <div class="plane-icon">
+        <i data-lucide="plane" size="24"></i>
+      </div>
+
+      <div class="flight-info arrival" style="text-align: right;">
+        <span class="airport-code">${f.arrival.iata}</span>
+        <div class="flight-time">${arrTime} ${arrDelay}</div>
+      </div>
+
+      <div class="flight-meta">
+        <div class="flight-number-badge">${f.flight.iata}</div>
+        <div class="flight-status ${f.status}">
+          <i data-lucide="${statusIcon}" size="12"></i>
+          ${f.status}
+        </div>
       </div>
     `;
 
-    output.appendChild(div);
-  }
-}
-
-function setupAutocomplete(input) {
-  const box = document.createElement("div");
-  box.className = "suggestions";
-
-  input.parentNode.style.position = "relative";
-
-  input.parentNode.appendChild(box);
-
-  input.addEventListener("input", function () {
-    const value = input.value.toUpperCase();
-
-    box.innerHTML = "";
-
-    if (!value) {
-      return;
-    }
-
-    let count = 0;
-
-    for (let i = 0; i < airports.length; i++) {
-      const a = airports[i];
-
-      const matchIata = a.iata.includes(value);
-      const matchCity = a.city.toUpperCase().includes(value);
-
-      if (matchIata || matchCity) {
-        const item = document.createElement("div");
-        item.textContent = a.iata + " - " + a.city;
-
-        item.addEventListener("click", function () {
-          input.value = a.iata;
-          box.innerHTML = "";
-        });
-
-        box.appendChild(item);
-
-        count = count + 1;
-
-        if (count === 5) {
-          break;
-        }
-      }
-    }
+    output.appendChild(card);
   });
 }
 
-document.addEventListener('click', function (e) {
-  if (e.target !== fromInput && e.target !== toInput) {
+// Debounce utility — delays execution until user stops typing
+function debounce(fn, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+function setupAutocomplete(input) {
+  const container = input.closest('.input-wrapper');
+  const box = document.createElement("div");
+  box.className = "suggestions";
+  container.appendChild(box);
+
+  const handleInput = debounce(function () {
+    const value = input.value.toUpperCase();
+    box.innerHTML = "";
+
+    if (!value) return;
+
+    const matches = airports.filter(a => 
+      a.iata.includes(value) || a.city.toUpperCase().includes(value)
+    ).slice(0, 6);
+
+    matches.forEach(a => {
+      const item = document.createElement("div");
+      item.className = "suggestion-item";
+      item.innerHTML = `
+        <span class="city">${a.city}</span>
+        <span class="iata">${a.iata}</span>
+      `;
+
+      item.addEventListener("click", () => {
+        input.value = a.iata;
+        box.innerHTML = "";
+      });
+
+      box.appendChild(item);
+    });
+  }, 200);
+
+  input.addEventListener("input", handleInput);
+}
+
+// Global click to close suggestions
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.input-wrapper')) {
     document.querySelectorAll('.suggestions').forEach(b => b.innerHTML = "");
   }
 });

@@ -1,37 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Flight Search</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyTrack | Premium Flight Explorer</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
   <div class="container">
-    <h2>Flight Search</h2>
+    <header>
+      <h1>SkyTrack</h1>
+      <p class="subtitle">Precision Flight Routing & Intelligence</p>
+    </header>
 
-    <div class="search-box">
-      <input id="from-input" placeholder="FROM">
-      <input id="to-input" placeholder="TO">
-      <input id="date-input" type="date">
+    <!-- Horizontal Search Toolbar on Desktop -->
+    <div class="search-card">
+      <div class="search-grid">
+        <div class="input-wrapper">
+          <label class="label">Origin</label>
+          <input id="from-input" placeholder="City or IATA" autocomplete="off">
+        </div>
+        <div class="input-wrapper">
+          <label class="label">Destination</label>
+          <input id="to-input" placeholder="City or IATA" autocomplete="off">
+        </div>
+        <div class="input-wrapper">
+          <label class="label">Travel Date</label>
+          <input id="date-input" type="date">
+        </div>
+        <div class="input-wrapper">
+          <label class="label">Schedule</label>
+          <select id="time-filter">
+            <option value="all">All Day</option>
+            <option value="morning">Morning (06:00 – 12:00)</option>
+            <option value="afternoon">Afternoon (12:00 – 18:00)</option>
+            <option value="evening">Evening (18:00 – 00:00)</option>
+            <option value="night">Night (00:00 – 06:00)</option>
+          </select>
+        </div>
+      </div>
 
-      <select id="time-filter">
-        <option value="all">All Day</option>
-        <option value="morning">Morning (06–12)</option>
-        <option value="afternoon">Afternoon (12–18)</option>
-        <option value="evening">Evening (18–00)</option>
-        <option value="night">Night (00–06)</option>
-      </select>
-
-      <button id="search-btn">Search</button>
-      <button id="sort-btn">Sort: Time ↑</button>
+      <div class="search-actions">
+        <button id="search-btn">
+          <i data-lucide="search" size="18"></i>
+          Search
+        </button>
+        <button id="sort-btn">
+          <i data-lucide="arrow-up-down" size="18"></i>
+          Time
+        </button>
+      </div>
     </div>
 
-    <div id="output"></div>
+    <!-- Results Display -->
+    <div id="output">
+      <div class="empty-state">
+        <i data-lucide="compass" size="48" style="margin-bottom: 1.5rem; opacity: 0.15;"></i>
+        <p>Your journey begins here. Enter a route to start exploring.</p>
+      </div>
+    </div>
   </div>
 
+  <!-- Theme Toggle Button (Sticky Bottom Right) -->
+  <button id="theme-toggle" title="Switch Theme">
+    <i data-lucide="moon"></i>
+  </button>
+
+  <!-- Script Files -->
   <script src="airports.js"></script>
   <script src="api.js"></script>
   <script src="app.js"></script>
+  <script src="theme.js"></script>
+  <script>
+    // Start Lucide Icons
+    lucide.createIcons();
+  </script>
 
 </body>
+
 </html>
