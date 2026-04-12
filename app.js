@@ -3,9 +3,11 @@ const toInput = document.getElementById('to-input');
 const dateInput = document.getElementById('date-input');
 const searchBtn = document.getElementById('search-btn');
 const sortBtn = document.getElementById('sort-btn');
+const timeFilter = document.getElementById('time-filter');
 const output = document.getElementById('output');
 
-let currentFlights = [];
+let allFlights = [];      // unfiltered results from API
+let currentFlights = [];   // after time filter is applied
 let currentSort = "time-asc";
 
 setupAutocomplete(fromInput);
@@ -26,6 +28,12 @@ sortBtn.addEventListener('click', function () {
   renderFlights(currentFlights);
 });
 
+timeFilter.addEventListener('change', function () {
+  currentFlights = applyTimeFilter(allFlights);
+  applySort();
+  renderFlights(currentFlights);
+});
+
 async function handleSearch() {
   const from = fromInput.value.trim().toUpperCase();
   const to = toInput.value.trim().toUpperCase();
@@ -42,7 +50,8 @@ async function handleSearch() {
   try {
     const flights = await searchFlights(from, to, date);
 
-    currentFlights = flights;
+    allFlights = flights;
+    currentFlights = applyTimeFilter(allFlights);
 
     applySort();
     renderFlights(currentFlights);
@@ -52,6 +61,33 @@ async function handleSearch() {
   } finally {
     searchBtn.disabled = false;
   }
+}
+
+// Returns a filtered copy of flights based on the selected time period
+function applyTimeFilter(flights) {
+  const period = timeFilter.value;
+
+  if (period === "all") return flights.slice();
+
+  // Define the hour ranges for each period
+  const ranges = {
+    morning: { start: 6, end: 12 },
+    afternoon: { start: 12, end: 18 },
+    evening: { start: 18, end: 24 },
+    night: { start: 0, end: 6 }
+  };
+
+  const range = ranges[period];
+
+  return flights.filter(function (f) {
+    const dep = f.departure.scheduled;
+    if (!dep) return false;
+
+    // Extract the hour from the ISO-like datetime string (e.g. "2026-04-11T14:30:00")
+    const hour = parseInt(dep.split('T')[1].split(':')[0], 10);
+
+    return hour >= range.start && hour < range.end;
+  });
 }
 
 function applySort() {
